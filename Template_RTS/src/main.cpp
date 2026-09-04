@@ -6,52 +6,63 @@
 
 int main() {
     LL::RTS::Player player;
+
     auto bob = std::make_unique<LL::RTS::Character>();
     bob->SetName("Bob Dylan");
+
     auto lili = std::make_unique<LL::RTS::Character>();
     lili->SetName("Lili");
+
     auto charlie = std::make_unique<LL::RTS::Character>();
     charlie->SetName("Charlie Chaplin");
+    
+    auto nelson = std::make_unique<LL::RTS::Character>();
+    nelson->SetName("Nelson Mandela");
 
-    // SelectCharacter replaces selection. Use AddToSelection to multi-select.
+    // Select Bob and Charlie as a group (will receive formation offsets)
     player.SelectCharacter(bob.get());
     player.AddToSelection(charlie.get());
+    player.AddToSelection(nelson.get());
 
-    // Keep target selection separate
-    player.SelectTarget(lili.get());
-
-    // Give a group move order to Bob and Charlie
+    // Move group to a far destination so formation is visible
     player.GiveOrder({
         LL::RTS::OrderType::Move,
-        {20, 20},
+        {50.0f, 0.0f},
         nullptr
         });
 
-    // Lili moves independently
-    lili->AddOrder({
-        LL::RTS::OrderType::Move,
-        {30, 30},
-        nullptr
-        });
-
+    // Then attack Lili together
     player.GiveOrder({
         LL::RTS::OrderType::Attack,
         {0,0},
         lili.get()
         });
 
-    float gameSpeedTest = 0.5f; // How many seconds in one tick?
+    // Lili moves independently elsewhere
+    player.SelectCharacter(lili.get());
+    lili->AddOrder({
+        LL::RTS::OrderType::Move,
+        {30.0f, 10.0f},
+        nullptr
+        });
 
-    for (int i = 0; i < 50; i++) {
-        // Tick time
-        lili->Update(gameSpeedTest);
-        lili->LogPosition();
+    float gameSpeedTest = 0.5f; // seconds per tick
 
+    // Run a few dozen ticks and log positions to watch formation
+    for (int i = 0; i < 40; ++i) {
         bob->Update(gameSpeedTest);
         bob->LogPosition();
 
         charlie->Update(gameSpeedTest);
         charlie->LogPosition();
+
+        nelson->Update(gameSpeedTest);
+        nelson->LogPosition();
+
+        lili->Update(gameSpeedTest);
+        lili->LogPosition();
+
+        std::cout << "---- tick " << i << " ----\n";
     }
 
     return 0;

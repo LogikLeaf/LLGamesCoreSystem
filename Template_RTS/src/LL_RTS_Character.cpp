@@ -42,35 +42,43 @@ namespace LL::RTS {
                 break;
             }
 
-            // Target is in range, attack it
-            if (IsInRange(execution.target)) {
+             // Compute the desired anchor position (target position + per-unit offset stored in execution.destination)
+            {
+                Maths::Vector2D desired = {
+                    execution.target->GetPosition().x + execution.destination.x,
+                    execution.target->GetPosition().y + execution.destination.y
+                };
 
-                // We are in range, stop chasing and attack
-                StopChase();
+                // Distance to desired anchor
+                float distanceToAnchor = Maths::VectorLength(position, desired);
 
-                // Is cooldown over?
-                if (attackTimer <= 0.0f) {
-                    Attack(execution.target);
-                    
-                    // Reset timer to enter cooldown
-                    attackTimer = GetAttackCooldownsSeconds();
-                }
+                // If within attack range (considering our range stat), stop chasing and attack
+                if (distanceToAnchor <= static_cast<float>(range.current)) {
+                    StopChase();
 
-                if (execution.target->HasFlag(Flag::Dead)) {
-                    orders.erase(orders.begin());
-                }
-            }
-            else {
-                // Target is too far, so start chasing it if we are not already chasing it
-                if (chaseTarget != execution.target) {
-                    // First time starting to chase this target
-                    MoveTo(execution.target->GetPosition());
-                    StartChase(execution.target);
+                    // Is cooldown over?
+                    if (attackTimer <= 0.0f) {
+                        Attack(execution.target);
+                        
+                        // Reset timer to enter cooldown
+                        attackTimer = GetAttackCooldownsSeconds();
+                    }
+
+                    if (execution.target->HasFlag(Flag::Dead)) {
+                        orders.erase(orders.begin());
+                    }
                 }
                 else {
-                    // Already chasing it, if we reached last chase point we execute a new MoveTo to keep following
-                    if (destinations.empty()) MoveTo(execution.target->GetPosition());
-                    // Otherwise do nothing because movement is in progress
+                    // Need to move toward the desired anchor. Start chase with stored offset if first time.
+                    if (chaseTarget != execution.target) {
+                        MoveTo(desired);
+                        StartChase(execution.target, execution.destination);
+                    }
+                    else {
+                        // Already chasing it, if we reached last chase point we execute a new MoveTo to keep following
+                        if (destinations.empty()) MoveTo(desired);
+                        // Otherwise do nothing because movement is in progress
+                    }
                 }
             }
             break;
@@ -84,7 +92,7 @@ namespace LL::RTS {
     }
 
 
-    void Character::MoveTowards(Maths::Vector2D target, float deltaTime) {
+    void Character::MoveToward(Maths::Vector2D target, float deltaTime) {
         direction = Maths::Direction(position, target);
 
         float distance = Maths::VectorLength(position, target);
@@ -113,12 +121,20 @@ namespace LL::RTS {
 
         if (chaseTarget && !chaseTarget->HasFlag(Flag::Dead)) {
 
-            if (IsInRange(chaseTarget)) {
+            // Compute chase anchor as target position plus per-unit stored offset
+            Maths::Vector2D chasePos = {
+                chaseTarget->GetPosition().x + chaseOffset.x,
+                chaseTarget->GetPosition().y + chaseOffset.y
+            };
+
+            // If we are now in range of the anchor, stop chase
+            float distToAnchor = Maths::VectorLength(position, chasePos);
+            if (distToAnchor <= static_cast<float>(range.current)) {
                 StopChase();
                 return;
             }
 
-            MoveTowards(chaseTarget->GetPosition(), deltaTime);
+            MoveToward(chasePos, deltaTime);
             return;
         }
 
@@ -127,7 +143,7 @@ namespace LL::RTS {
             return;
         }
 
-        MoveTowards(destinations.front(), deltaTime);
+        MoveToward(destinations.front(), deltaTime);
 
         if (position.x == destinations.front().x &&
             position.y == destinations.front().y) {
@@ -151,10 +167,14 @@ namespace LL::RTS {
         return distance <= static_cast<float>(range.current);
     }
 
-    void Character::StartChase(Character* target) { chaseTarget = target; }
+    void Character::StartChase(Character* target, Maths::Vector2D offset) { 
+        chaseTarget = target; 
+        chaseOffset = offset;
+    }
     
     void Character::StopChase() {
         chaseTarget = nullptr;
+        chaseOffset = { 0, 0 };
         destinations.clear();
         ClearFlag(Flag::Moving);
     }
@@ -203,7 +223,7 @@ namespace LL::RTS {
         Log(name + " attacks his target!");
 
         inTarget->TakeDamage(attackDamage.current);
-        }
+    }
 
 
     void Character::Kill() {

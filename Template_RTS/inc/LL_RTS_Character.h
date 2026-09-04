@@ -27,14 +27,14 @@ namespace LL::RTS {
         void ExecuteOrders();
 
         // Movements
-        void MoveTowards(Maths::Vector2D target, float deltaTime);
+        void MoveToward(Maths::Vector2D target, float deltaTime);
         void UpdateMovement(float deltaTime);
 
         // Range detection for attack
         bool IsInRange(Character* inTarget) const;
 
         // Chase
-        void StartChase(Character* target);
+        void StartChase(Character* target, Maths::Vector2D offset);
         void StopChase();
 
         // Cooldowns
@@ -74,8 +74,8 @@ namespace LL::RTS {
         // Stop moving
         void Stop();
 
-
-        void LogPosition();
+        // Debug tool
+        void LogPosition(); 
         // =====================
 
         // Flags
@@ -111,6 +111,9 @@ namespace LL::RTS {
 
         // Let's start the hunt
         Character* chaseTarget = nullptr;
+
+        // Per-unit chase offset - When chasing an attacked target keep formation
+        Maths::Vector2D chaseOffset = { 0, 0 };
 
 
     };

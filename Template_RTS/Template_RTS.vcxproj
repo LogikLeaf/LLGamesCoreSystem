@@ -140,12 +140,14 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\LL_Geometry.cpp" />
     <ClCompile Include="src\LL_Maths.cpp" />
     <ClCompile Include="src\LL_RTS_Character.cpp" />
     <ClCompile Include="src\LL_RTS_Player.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\LL_Geometry.h" />
     <ClInclude Include="inc\LL_Maths.h" />
     <ClInclude Include="inc\LL_RTS_Character.h" />
     <ClInclude Include="inc\LL_RTS_Enumerators.h" />

@@ -1,6 +1,14 @@
 #include "LL_Maths.h"
+#include <cmath>
 
 namespace LL::Maths {
+
+    float Clamp01(float t) {
+        if (t < 0.0f) return 0.0f;
+        if (t > 1.0f) return 1.0f;
+        return t;
+    }
+
     float VectorLength(Vector2D v1, Vector2D v2) {
         float dX = v2.x - v1.x;
         float dY = v2.y - v1.y;

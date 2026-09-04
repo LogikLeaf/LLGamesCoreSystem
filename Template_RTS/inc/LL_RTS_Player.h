@@ -20,22 +20,23 @@ namespace LL::RTS {
         void DeselectCharacter(Character* inCharacter);
         void ClearSelection();
 
-
+        // Targeting
         void SelectTarget(Character* inTarget);
-        void AttackTarget(uint32_t numberOfAttacks);
+        void DeselectTarget(Character* inTarget);
 
         // Broadcast an order to all selected Characters
         void GiveOrder(Order order);
 
-
-
         // Gettters
-        Character* GetSelectedCharacter(int index);
+        Character* GetSelectedCharacter(size_t index);
         const std::vector<Character*>& GetSelectedCharacters() const;
 
     private:
         std::vector<Character*> selectedCharacters;
         Character* target = nullptr;
+
+        // The space between two units when moving in formation
+        float formationSpacing = 3.0f;
     };
 
 

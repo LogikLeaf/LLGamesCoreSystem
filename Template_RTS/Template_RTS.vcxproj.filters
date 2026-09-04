@@ -27,6 +27,9 @@
     <ClCompile Include="src\LL_Maths.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LL_Geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\LL_Maths.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\LL_RTS_Structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\LL_Geometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
