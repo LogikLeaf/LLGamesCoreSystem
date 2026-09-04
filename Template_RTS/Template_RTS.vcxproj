@@ -111,6 +111,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,7 +140,17 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\LL_Maths.cpp" />
+    <ClCompile Include="src\LL_RTS_Character.cpp" />
+    <ClCompile Include="src\LL_RTS_Player.cpp" />
     <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\LL_Maths.h" />
+    <ClInclude Include="inc\LL_RTS_Character.h" />
+    <ClInclude Include="inc\LL_RTS_Enumerators.h" />
+    <ClInclude Include="inc\LL_RTS_Player.h" />
+    <ClInclude Include="inc\LL_RTS_Structs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

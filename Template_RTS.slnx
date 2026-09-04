@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Template_RTS/Template_RTS.vcxproj" />
+  <Project Path="Template_RTS/Template_RTS.vcxproj" Id="e1e516a5-d533-4fe7-a285-7b117bd1aa07" />
 </Solution>
