@@ -37,6 +37,9 @@ namespace LL::RTS {
         void StartChase(Character* target);
         void StopChase();
 
+        // Cooldowns
+        float GetAttackCooldownsSeconds() const;
+
 
     public:
         // Getters
