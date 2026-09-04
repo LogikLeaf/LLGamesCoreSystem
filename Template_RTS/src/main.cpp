@@ -149,70 +149,67 @@ private:
 
         case OrderType::Stop:
             Stop();
-            StopChase();
             orders.clear();
             break;
         }
 
     }
 
+    void MoveTowards(RTS_Maths::Vector2D target, float deltaTime) {
+        direction = RTS_Maths::Direction(position, target);
+
+        float distance = RTS_Maths::VectorLength(position, target);
+        if (distance <= 0.0f) return;
+
+        float movementDistance = movementSpeed.current * deltaTime;
+
+        if (movementDistance >= distance) {
+            position = target;
+            return;
+        }
+
+        direction = RTS_Maths::Normalize(direction, distance);
+        velocity = RTS_Maths::Velocity(
+            direction,
+            static_cast<float>(movementSpeed.current)
+        );
+
+        position.x += velocity.x * deltaTime;
+        position.y += velocity.y * deltaTime;
+
+        SetFlag(Flag::Moving);
+    }
 
     void UpdateMovement(float deltaTime) {
-        // If we have a chase target, pursue its live position every frame
+
         if (chaseTarget && !chaseTarget->HasFlag(Flag::Dead)) {
-            // If we're already in range, we shouldn't be chasing
+
             if (IsInRange(chaseTarget)) {
                 StopChase();
                 return;
             }
 
-            // Compute live direction/velocity toward target
-            RTS_Maths::Vector2D targetPos = chaseTarget->GetPosition();
-            direction = RTS_Maths::Direction(position, targetPos);
-            float distance = RTS_Maths::VectorLength(position, targetPos);
-            if (distance <= 0.0f) return;
-
-            // movement this frame
-            float movementDistance = movementSpeed.current * deltaTime;
-            if (movementDistance >= distance) {
-                // arrive on top of target's last position (will loop next frame and update)
-                position = targetPos;
-                ClearFlag(Flag::Moving);
-                return;
-            }
-
-            direction = RTS_Maths::Normalize(direction, distance);
-            velocity = RTS_Maths::Velocity(direction, static_cast<float>(movementSpeed.current));
-            if (!HasFlag(Flag::Moving)) SetFlag(Flag::Moving);
-            position.x += velocity.x * deltaTime;
-            position.y += velocity.y * deltaTime;
+            MoveTowards(chaseTarget->GetPosition(), deltaTime);
             return;
         }
 
-        // Fallback: follow static destinations as before
         if (destinations.empty()) {
             ClearFlag(Flag::Moving);
             return;
         }
 
-        if (!HasFlag(Flag::Moving)) SetFlag(Flag::Moving);
-        RTS_Maths::Vector2D destination = destinations.front();
-        direction = RTS_Maths::Direction(position, destination);
-        float distance = RTS_Maths::VectorLength(position, destination);
-        float movementDistance = movementSpeed.current * deltaTime;
+        MoveTowards(destinations.front(), deltaTime);
 
-        if (movementDistance >= distance) {
-            position = destination;
+        if (position.x == destinations.front().x &&
+            position.y == destinations.front().y) {
+
             destinations.erase(destinations.begin());
-            if (destinations.empty()) ClearFlag(Flag::Moving);
-            return;
-        }
 
-        direction = RTS_Maths::Normalize(direction, distance);
-        velocity = RTS_Maths::Velocity(direction, static_cast<float>(movementSpeed.current));
-        position.x += velocity.x * deltaTime;
-        position.y += velocity.y * deltaTime;
+            if (destinations.empty())
+                ClearFlag(Flag::Moving);
+        }
     }
+
 
     bool IsInRange(Character* inTarget) const {
         if (!inTarget) return false;
@@ -236,7 +233,7 @@ private:
 public:
     // Getters
     std::string GetName() const {return name;}
-    uint32_t GetAttack() const { return attack.current; }
+    uint32_t GetAttack() const { return attackDamage.current; }
     RTS_Maths::Vector2D GetPosition() const { return position; }
     RTS_Maths::Vector2D GetDirection() const { return direction; }
     RTS_Maths::Vector2D GetVelocity() const { return velocity; }
@@ -272,7 +269,7 @@ public:
 
         Log(name + " attacks his target!");
 
-        inTarget->TakeDamage(attack.current);
+        inTarget->TakeDamage(attackDamage.current);
     }
 
 
@@ -319,9 +316,13 @@ protected:
     std::string name = "Character";
 
     Stat health = {10,0,10,10};
-    Stat attack = {3,0,3,3};
     Stat range = {5,0,5,5};
     Stat movementSpeed = {5,0,5,5};
+
+    Stat attackDamage = {3,0,3,3};
+    Stat attackSpeed = {2,0,2,2};
+
+    float attackTimer = 0.0f;
 
     uint8_t flags = 0;
 
