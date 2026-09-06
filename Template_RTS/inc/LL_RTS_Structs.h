@@ -21,4 +21,13 @@ namespace LL::RTS {
         Maths::Vector2D destination;
         Character* target = nullptr;
     };
+
+    // Each Entity has an id. To make it unique, we use a generations system.
+    // A destroyed Entity will just free the id slot (== make it available for
+    // a new Entity). To make sure nothing references a destroyed element,
+    // we increment generation every time a new Entity takes the slot.
+    struct EntityId {
+        uint32_t id = 0;
+        uint32_t generation = 0;
+    };
 }

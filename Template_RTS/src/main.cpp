@@ -1,11 +1,14 @@
 #include <iostream>
 #include <string>
 
+#include "LL_RTS_GameMaster.h"
 #include "LL_RTS_Player.h"
+#include "LL_RTS_Character.h"
 
 
 int main() {
-    LL::RTS::Player player;
+    LL::RTS::GameMaster GM;
+    LL::RTS::Player player(&GM);
 
     auto bob = std::make_unique<LL::RTS::Character>();
     bob->SetName("Bob Dylan");

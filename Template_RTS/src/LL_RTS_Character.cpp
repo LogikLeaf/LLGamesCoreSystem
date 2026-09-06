@@ -1,6 +1,14 @@
 #include "LL_RTS_Character.h"
+#include "LL_RTS_GameMaster.h"
+#include "LL_RTS_Player.h"
+#include "LL_Maths.h"
 
 namespace LL::RTS {
+
+    // Make sure we initialize base Entity with the GM (use a default position/id here)
+    Character::Character(GameMaster* GM) 
+        : Entity(GM, Maths::Vector2D{0,0}, 0) { }
+
     // Time
     void Character::Update(float deltaTime) {
         if (HasFlag(Flag::Dead)) return;
@@ -212,6 +220,8 @@ namespace LL::RTS {
             Kill();
         }
         else health.current -= damage;
+
+        //GM->UpdateState(this); // Note: Need to think about this architecture
 
         Log(name + " has " + std::to_string(health.current) + " health left...");
     }

@@ -3,15 +3,16 @@
 #include <vector>
 #include <memory>
 
-#include "LL_RTS_Character.h"
-
-
 namespace LL::RTS {
 
-
+    class GameMaster;
+    struct Order;
+    class Character;
 
     class Player {
     public:
+        Player(GameMaster* GM);
+
         // Select a single Character
         void SelectCharacter(Character* inCharacter);
 
@@ -37,6 +38,10 @@ namespace LL::RTS {
 
         // The space between two units when moving in formation
         float formationSpacing = 3.0f;
+
+        GameMaster* GM = nullptr;
+
+
     };
 
 

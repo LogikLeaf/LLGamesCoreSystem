@@ -6,18 +6,25 @@
 
 #include "LL_RTS_Enumerators.h"
 #include "LL_RTS_Structs.h"
-#include "LL_Maths.h"
+#include "LL_RTS_Entity.h"
 
-
+// Global log for debug
 template <typename T>
 void Log(const T& msg) {
     std::cout << msg << std::endl;
 }
 
 namespace LL::RTS {
-    class Character {
+
+    class GameMaster;
+    class Player;
+    struct Vector2D;
+    
+    class Character : public Entity {
 
     public:
+
+        Character(GameMaster* GM);
 
         // Time
         void Update(float deltaTime);
@@ -45,6 +52,7 @@ namespace LL::RTS {
         // Getters
         std::string GetName() const;
         uint32_t GetAttack() const;
+        Stat GetHealth() const;
         Maths::Vector2D GetPosition() const;
         Maths::Vector2D GetDirection() const;
         Maths::Vector2D GetVelocity() const;
@@ -114,6 +122,10 @@ namespace LL::RTS {
 
         // Per-unit chase offset - When chasing an attacked target keep formation
         Maths::Vector2D chaseOffset = { 0, 0 };
+
+        // Who owns me?
+        // TODO: make it the AI Controller by default if no player controls it
+        Player* owningPlayer = nullptr; 
 
 
     };

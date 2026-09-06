@@ -1,12 +1,17 @@
 #include "LL_RTS_Player.h"
+#include "LL_RTS_GameMaster.h"
 #include "LL_Geometry.h"
 #include "LL_Maths.h"
+#include "LL_RTS_Character.h"
+
 
 #include <algorithm>
 #include <cmath>
 
 
 namespace LL::RTS {
+
+    Player::Player(GameMaster* GM) : GM(GM) {}
     
     void Player::SelectCharacter(Character* inCharacter) {
         // Also clears the flags

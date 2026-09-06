@@ -143,6 +143,9 @@
     <ClCompile Include="src\LL_Geometry.cpp" />
     <ClCompile Include="src\LL_Maths.cpp" />
     <ClCompile Include="src\LL_RTS_Character.cpp" />
+    <ClCompile Include="src\LL_RTS_Entity.cpp" />
+    <ClCompile Include="src\LL_RTS_EntitySlot.cpp" />
+    <ClCompile Include="src\LL_RTS_GameMaster.cpp" />
     <ClCompile Include="src\LL_RTS_Player.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
@@ -150,9 +153,15 @@
     <ClInclude Include="inc\LL_Geometry.h" />
     <ClInclude Include="inc\LL_Maths.h" />
     <ClInclude Include="inc\LL_RTS_Character.h" />
+    <ClInclude Include="inc\LL_RTS_Entity.h" />
+    <ClInclude Include="inc\LL_RTS_EntitySlot.h" />
     <ClInclude Include="inc\LL_RTS_Enumerators.h" />
+    <ClInclude Include="inc\LL_RTS_GameMaster.h" />
     <ClInclude Include="inc\LL_RTS_Player.h" />
     <ClInclude Include="inc\LL_RTS_Structs.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\.github\copilot-instructions.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
