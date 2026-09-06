@@ -3,11 +3,16 @@
 
 namespace LL::RTS {
 
-	Entity::Entity(GameMaster* GM, Maths::Vector2D position, uint32_t id)
+	Entity::Entity(GameMaster* GM, Maths::Vector2D position, EntityId id)
 		: GM(GM), position(position), id(id) {}
 
 	Entity::~Entity() {
-		GM->RemoveEntity(this);
+		if (GM) GM->RemoveEntity(id);
+	}
+
+	void Entity::SetId(EntityId id)
+	{
+		this->id = id;
 	}
 
 

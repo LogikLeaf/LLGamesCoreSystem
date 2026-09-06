@@ -17,4 +17,13 @@ namespace LL::RTS {
         Attack,
         Stop
     };
+
+    enum class Resource : uint32_t {
+        Wood,
+        Stone,
+        Gold,
+        Food,
+
+        Count = 4
+    };
 }

@@ -22,13 +22,13 @@ namespace LL::RTS {
 	void EntitySlot::Destroy() {
 		entity.reset();
 		entityId.generation++;
-		GM->AddAvailableSlot(entityId.id);
+		if (GM) GM->AddAvailableSlot(entityId.id);
 	}
 
 
 	void EntitySlot::Add(std::unique_ptr<Entity> entity) {
-		entity = std::move(entity);
-		GM->RemoveAvailableSlot(entityId.id);
+		this->entity = std::move(entity);
+		if (GM) GM->RemoveAvailableSlot(entityId.id);
 	}
 
 }

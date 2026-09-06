@@ -14,13 +14,16 @@ namespace LL::RTS {
 	class GameMaster;
 
 	class Entity {
+	public:
 		// An entity has necesserly a 2D world location
-		Entity(GameMaster* GM, Maths::Vector2D position, uint32_t id);
+		Entity(GameMaster* GM, Maths::Vector2D position, EntityId id);
 		~Entity();
+
+		void SetId(EntityId id);
 
 	protected:
 		Maths::Vector2D position = { 0,0 };
 		GameMaster* GM = nullptr;
-		uint32_t id = 0;
+		EntityId id = { 0,0 };
 	};
 }

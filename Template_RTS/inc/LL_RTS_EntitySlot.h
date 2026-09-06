@@ -17,7 +17,9 @@ namespace LL::RTS {
 
 	class EntitySlot {
 	public:
-		// Constructor to get the mandatory GameMaster's reference
+		// Default constructor
+		EntitySlot();
+		// Constructor to get the mandatory GameMaster's reference and my EntityId
 		EntitySlot(GameMaster* GM, uint32_t id);
 
 		// Getters

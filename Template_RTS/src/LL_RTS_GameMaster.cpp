@@ -1,12 +1,24 @@
 #include "LL_RTS_GameMaster.h"
+//#include "LL_RTS_Player.h"
 #include "LL_RTS_Entity.h"
-#include "LL_RTS_EntitySlot.h"
+//#include "LL_RTS_EntitySlot.h"
 #include "LL_RTS_Character.h"
 
 namespace LL::RTS {
 
 	void GameMaster::StartGame() {
 		// TODO: complete this
+		// - Main menu
+		// - Create Game with all the players
+		// - Consider an AI "neutral" player
+		// ...
+	}
+
+	void GameMaster::AddPlayer(Player player) {
+		uint32_t newId = static_cast<uint32_t>(players.size());
+		players.push_back(std::make_unique<Player>(this, newId));
+		/* TODO: Here, set the player's variables */
+
 	}
 
 	void GameMaster::SpawnCharacter(Character character) {
@@ -19,16 +31,21 @@ namespace LL::RTS {
 		
 		if (freeSlots.empty()) { // No available slot
 			// New slot id
-			uint32_t newId = entities.size();
+			uint32_t newId = static_cast<uint32_t>(entities.size());
 			// Create a new slot and add a Character entity to it
 			auto slot = std::make_unique<EntitySlot>(this, newId);
 
-
+			// Update the Character's id
+			characterEntity->SetId(slot->GetId());
 
 			slot->Add(std::move(characterEntity));
 			entities.push_back(std::move(slot));
 		}
 		else { // A slot is available
+
+			// Update the Character's id
+			characterEntity->SetId(entities.at(freeSlots.at(0))->GetId());
+
 			// Add the new character to the first available slot
 			entities.at(freeSlots.at(0))->Add(std::move(characterEntity));
 		}

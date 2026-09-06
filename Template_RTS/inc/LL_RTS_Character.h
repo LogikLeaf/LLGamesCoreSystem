@@ -19,11 +19,13 @@ namespace LL::RTS {
     class GameMaster;
     class Player;
     struct Vector2D;
-    
+    class ResourcePool;
+
     class Character : public Entity {
 
     public:
 
+        Character();
         Character(GameMaster* GM);
 
         // Time
@@ -83,7 +85,7 @@ namespace LL::RTS {
         void Stop();
 
         // Debug tool
-        void LogPosition(); 
+        void LogPosition();
         // =====================
 
         // Flags
@@ -105,6 +107,9 @@ namespace LL::RTS {
         float attackTimer = 0.0f;
 
         uint8_t flags = 0;
+
+        // How much of each resource this unit costs each tick?
+        std::unique_ptr<ResourcePool> maintenanceCost;
 
 
         Maths::Vector2D position = { 0, 0 };

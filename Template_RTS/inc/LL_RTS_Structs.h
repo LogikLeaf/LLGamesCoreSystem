@@ -30,4 +30,5 @@ namespace LL::RTS {
         uint32_t id = 0;
         uint32_t generation = 0;
     };
+
 }

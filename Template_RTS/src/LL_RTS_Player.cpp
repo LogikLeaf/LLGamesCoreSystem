@@ -3,6 +3,7 @@
 #include "LL_Geometry.h"
 #include "LL_Maths.h"
 #include "LL_RTS_Character.h"
+//#include "LL_RTS_ResourcePool.h"
 
 
 #include <algorithm>
@@ -11,8 +12,12 @@
 
 namespace LL::RTS {
 
-    Player::Player(GameMaster* GM) : GM(GM) {}
-    
+    Player::Player(GameMaster* GM) : GM(GM), id(0) {}
+    Player::Player(GameMaster* GM, uint32_t id) : GM(GM), id(id) {}
+
+
+
+
     void Player::SelectCharacter(Character* inCharacter) {
         // Also clears the flags
         ClearSelection();
@@ -159,5 +164,50 @@ namespace LL::RTS {
 
     const std::vector<Character*>& Player::GetSelectedCharacters() const {
         return selectedCharacters;
+    }
+
+
+    bool Player::PayUnit(ResourcePool* resourceCost)
+    {
+        // 1. Check if we have enough of every resource
+        for (size_t i = 0; i < static_cast<size_t>(Resource::Count); i++) {
+            Resource resource = static_cast<Resource>(i);
+            uint32_t cost = resourceCost->Get(resource);
+
+            if (resources->Get(resource) < cost) return false; // We don't, stop here and return false
+
+        }
+
+        // 2. We have enough, proceed payout
+        for (size_t i = 0; i < static_cast<size_t>(Resource::Count); i++) {
+            Resource resource = static_cast<Resource>(i);
+            uint32_t cost = resourceCost->Get(resource);
+            resources->Adjust(resource, -static_cast<int64_t>(cost));
+        }
+        
+        return true;
+
+    }
+
+
+    /*TODO: Building's maintenance cost
+    * Just copy/paste the PayUnit method. Should be easy.
+    */
+    bool Player::PayBuilding(ResourcePool resourceCost)
+    {
+        return false;
+    }
+
+
+
+    bool Player::UseResource(Resource resource, uint32_t amount)
+    {
+        uint32_t current = resources->Get(resource);
+        if (current < amount) return false; // Not enough, fail action and return false
+        
+        // Otherwise, proceed and return true
+        resources->Adjust(resource, -static_cast<int64_t>(amount));
+        return true;
+
     }
 }

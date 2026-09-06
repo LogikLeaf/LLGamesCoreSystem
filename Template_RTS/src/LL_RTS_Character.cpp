@@ -1,13 +1,19 @@
 #include "LL_RTS_Character.h"
 #include "LL_RTS_GameMaster.h"
 #include "LL_RTS_Player.h"
+#include "LL_RTS_ResourcePool.h"
 #include "LL_Maths.h"
 
 namespace LL::RTS {
 
+    // Default constructor (safe minimal implementation)
+    Character::Character()
+        : Entity(nullptr, Maths::Vector2D{ 0,0 }, EntityId()) {
+    }
+
     // Make sure we initialize base Entity with the GM (use a default position/id here)
     Character::Character(GameMaster* GM) 
-        : Entity(GM, Maths::Vector2D{0,0}, 0) { }
+        : Entity(GM, Maths::Vector2D{0,0}, EntityId()) { }
 
     // Time
     void Character::Update(float deltaTime) {
@@ -21,6 +27,15 @@ namespace LL::RTS {
 
         ExecuteOrders();
         UpdateMovement(deltaTime);
+
+        /* TODO: */
+        // bool paid = owningPlayer->PayUnit(maintenanceCost); // I ask the player to pay for my maintenance, returns false if he couldn't
+        /* 
+        * if (!paid) TakeDamage( ... ); // I loose HP (decide how much, maybe 10%? ) if my maintenance cost was not paid this loop
+        * 
+        * Something to consider: we won't make this update at every tick, 
+        * so we need a timer that tells how long we wait between each maintenance cost trigger.
+        */
     }
 
     void Character::ExecuteOrders() {

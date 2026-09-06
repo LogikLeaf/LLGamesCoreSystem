@@ -3,18 +3,23 @@
 #include <memory>
 
 #include "LL_RTS_Structs.h"
+#include "LL_RTS_EntitySlot.h"
+#include "LL_RTS_Player.h"
 
 namespace LL::RTS {
 
+	class Player;
 	class Entity;
-	class EntitySlot;
+	//class EntitySlot;
 	class Character;
-	//class Player;
 
 	class GameMaster {
 	public:
 		// Starts the game and initializes everything
 		void StartGame();
+
+		// Add a player to this game
+		void AddPlayer(Player player);
 
 		// To update the state of an entity, but should be used to communicate with the server?
 		// Need to think about it
@@ -36,6 +41,9 @@ namespace LL::RTS {
 	private:
 		std::vector<std::unique_ptr<EntitySlot>> entities;
 		std::vector<uint32_t> freeSlots;
+
+		std::vector<std::unique_ptr<Player>> players;
+
 
 	};
 

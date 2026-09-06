@@ -147,6 +147,7 @@
     <ClCompile Include="src\LL_RTS_EntitySlot.cpp" />
     <ClCompile Include="src\LL_RTS_GameMaster.cpp" />
     <ClCompile Include="src\LL_RTS_Player.cpp" />
+    <ClCompile Include="src\LL_RTS_ResourcePool.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +159,7 @@
     <ClInclude Include="inc\LL_RTS_Enumerators.h" />
     <ClInclude Include="inc\LL_RTS_GameMaster.h" />
     <ClInclude Include="inc\LL_RTS_Player.h" />
+    <ClInclude Include="inc\LL_RTS_ResourcePool.h" />
     <ClInclude Include="inc\LL_RTS_Structs.h" />
   </ItemGroup>
   <ItemGroup>
