@@ -8,7 +8,7 @@
 
 namespace LL::RTS {
 
-	class Player;
+	//class Player;
 	class Entity;
 	//class EntitySlot;
 	class Character;
