@@ -1,6 +1,5 @@
 #include "LL_RTS_Player.h"
 #include "LL_RTS_GameMaster.h"
-#include "LL_Geometry.h"
 #include "LL_Maths.h"
 #include "LL_RTS_Character.h"
 //#include "LL_RTS_ResourcePool.h"
@@ -82,32 +81,23 @@ namespace LL::RTS {
         }
         // For Move and Attack we compute a perpendicular formation line
         // Compute movement direction and perpendicular (world-space) using first unit as reference
-        Geometry::Point startPoint;
-        startPoint.x = selectedCharacters.front()->GetPosition().x;
-        startPoint.y = selectedCharacters.front()->GetPosition().y;
+        Maths::Position start = selectedCharacters.front()->GetPosition();
+        Maths::Position dest = { order.destination.x, order.destination.y };
 
-        Maths::Vector2D start = { startPoint.x, startPoint.y };
-        Maths::Vector2D dest = { order.destination.x, order.destination.y };
+        // The Vector between start and dest models the unit direction
+        Maths::Vector toDest(start, dest);
+        Maths::Position dir = (toDest.Length() > 1e-6f) ? toDest.Normalize() : Maths::Position{ 0.0f, 1.0f };
 
-        // Direction from start to destination
-        Maths::Vector2D dir = Maths::Direction(start, dest);
-        float dirLen = Maths::VectorLength(start, dest);
+        // Perpendicular to a unit vector is itself unit-length: (-dy, dx)
+        Maths::Position perp = { -dir.y, dir.x };
 
-        // If destination == start, choose a default direction
-        if (dirLen <= 1e-6f) {
-            dir = { 0.0f, 1.0f };
-            dirLen = 1.0f;
-        }
-
-        // Perpendicular to dir: (-dy, dx)
-        Maths::Vector2D perp = { -dir.y, dir.x };
         // normalize perp
         float perpLen = std::sqrt(perp.x * perp.x + perp.y * perp.y);
         if (perpLen <= 1e-6f) {
             perp = { 0.0f, 1.0f };
             perpLen = 1.0f;
         }
-        perp = Maths::Normalize(perp, perpLen);
+
 
         size_t n = selectedCharacters.size();
         float half = (static_cast<float>(n) - 1.0f) / 2.0f;

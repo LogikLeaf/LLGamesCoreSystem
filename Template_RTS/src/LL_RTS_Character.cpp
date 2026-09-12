@@ -8,12 +8,12 @@ namespace LL::RTS {
 
     // Default constructor (safe minimal implementation)
     Character::Character()
-        : Entity(nullptr, Maths::Vector2D{ 0,0 }, EntityId()) {
+        : Entity(nullptr, Maths::Position{ 0,0 }, EntityId()) {
     }
 
     // Make sure we initialize base Entity with the GM (use a default position/id here)
     Character::Character(GameMaster* GM) 
-        : Entity(GM, Maths::Vector2D{0,0}, EntityId()) { }
+        : Entity(GM, Maths::Position{0,0}, EntityId()) { }
 
     // Time
     void Character::Update(float deltaTime) {
@@ -67,13 +67,13 @@ namespace LL::RTS {
 
              // Compute the desired anchor position (target position + per-unit offset stored in execution.destination)
             {
-                Maths::Vector2D desired = {
+                Maths::Position desired = {
                     execution.target->GetPosition().x + execution.destination.x,
                     execution.target->GetPosition().y + execution.destination.y
                 };
 
                 // Distance to desired anchor
-                float distanceToAnchor = Maths::VectorLength(position, desired);
+                float distanceToAnchor = Maths::Vector(position, desired).Length();
 
                 // If within attack range (considering our range stat), stop chasing and attack
                 if (distanceToAnchor <= static_cast<float>(range.current)) {
@@ -115,10 +115,9 @@ namespace LL::RTS {
     }
 
 
-    void Character::MoveToward(Maths::Vector2D target, float deltaTime) {
-        direction = Maths::Direction(position, target);
-
-        float distance = Maths::VectorLength(position, target);
+    void Character::MoveToward(Maths::Position target, float deltaTime) {
+        Maths::Vector toTarget(position, target);
+        float distance = toTarget.Length();
         if (distance <= 0.0f) return;
 
         float movementDistance = movementSpeed.current * deltaTime;
@@ -128,11 +127,9 @@ namespace LL::RTS {
             return;
         }
 
-        direction = Maths::Normalize(direction, distance);
-        velocity = Maths::Velocity(
-            direction,
-            static_cast<float>(movementSpeed.current)
-        );
+        // The Vector already models the direction; no separate helper needed.
+        direction = toTarget.Normalize();
+        velocity = direction * static_cast<float>(movementSpeed.current);
 
         position.x += velocity.x * deltaTime;
         position.y += velocity.y * deltaTime;
@@ -140,18 +137,19 @@ namespace LL::RTS {
         SetFlag(Flag::Moving);
     }
 
+
     void Character::UpdateMovement(float deltaTime) {
 
         if (chaseTarget && !chaseTarget->HasFlag(Flag::Dead)) {
 
             // Compute chase anchor as target position plus per-unit stored offset
-            Maths::Vector2D chasePos = {
+            Maths::Position chasePos = {
                 chaseTarget->GetPosition().x + chaseOffset.x,
                 chaseTarget->GetPosition().y + chaseOffset.y
             };
 
             // If we are now in range of the anchor, stop chase
-            float distToAnchor = Maths::VectorLength(position, chasePos);
+            float distToAnchor = Maths::Vector(position, chasePos).Length();
             if (distToAnchor <= static_cast<float>(range.current)) {
                 StopChase();
                 return;
@@ -182,15 +180,12 @@ namespace LL::RTS {
     bool Character::IsInRange(Character* inTarget) const {
         if (!inTarget) return false;
 
-        float distance = Maths::VectorLength(
-            position,
-            inTarget->GetPosition()
-        );
+        float distance = Maths::Vector(position, inTarget->GetPosition()).Length();
 
         return distance <= static_cast<float>(range.current);
     }
 
-    void Character::StartChase(Character* target, Maths::Vector2D offset) { 
+    void Character::StartChase(Character* target, Maths::Position offset) { 
         chaseTarget = target; 
         chaseOffset = offset;
     }
@@ -210,9 +205,9 @@ namespace LL::RTS {
     // Getters
     std::string Character::GetName() const { return name; }
     uint32_t Character::GetAttack() const { return attackDamage.current; }
-    Maths::Vector2D Character::GetPosition() const { return position; }
-    Maths::Vector2D Character::GetDirection() const { return direction; }
-    Maths::Vector2D Character::GetVelocity() const { return velocity; }
+    Maths::Position Character::GetPosition() const { return position; }
+    Maths::Position Character::GetDirection() const { return direction; }
+    Maths::Position Character::GetVelocity() const { return velocity; }
 
     // Setters
     void Character::SetName(const std::string& inName) { name = inName; }
@@ -260,13 +255,13 @@ namespace LL::RTS {
 
     // ===== Movements =====
     // Go to a specified destination
-    void Character::MoveTo(Maths::Vector2D inVector) {
+    void Character::MoveTo(Maths::Position inVector) {
         destinations.clear();
         destinations.push_back(inVector);
     }
 
     // Buffer multiple destinations
-    void Character::AddDestination(Maths::Vector2D inDestination) {
+    void Character::AddDestination(Maths::Position inDestination) {
         destinations.push_back(inDestination);
     }
 

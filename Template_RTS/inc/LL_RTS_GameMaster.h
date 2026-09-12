@@ -8,34 +8,34 @@
 
 namespace LL::RTS {
 
-	//class Player;
 	class Entity;
-	//class EntitySlot;
 	class Character;
 
+	/** Owns all entities and players, and mediates orders between them. */
 	class GameMaster {
 	public:
-		// Starts the game and initializes everything
+		/** Starts the game and initializes everything. */
 		void StartGame();
 
-		// Add a player to this game
+		/** Adds a player to this game. */
 		void AddPlayer(Player player);
 
 		// To update the state of an entity, but should be used to communicate with the server?
 		// Need to think about it
 		//void UpdateState()
 
+		/** Frees the entity's slot, making its id available for reuse. */
 		void RemoveEntity(EntityId entityId);
 
-		// When a Player asks a specific Character to do something
+		/** Gives an order to the specified characters. */
 		void AddOrder(Order order, std::vector<Character*> character);
 
-		// A new slot is free, add it to the freeSlots list, so we know we can use it
+		/** Marks a slot as free so it can be reused. */
 		void AddAvailableSlot(uint32_t slotId);
-		// A slot just got filled with an entity, remove it from the freeSlots list
+		/** Marks a slot as occupied, removing it from the free list. */
 		void RemoveAvailableSlot(uint32_t slotId);
 
-		// Spawn Character and add it to a free slot
+		/** Spawns a Character into a free slot. */
 		void SpawnCharacter(Character character);
 
 	private:

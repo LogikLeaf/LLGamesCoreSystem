@@ -140,8 +140,10 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\LL_Geometry.cpp" />
+    <ClCompile Include="src\LL_Grid.cpp" />
+    <ClCompile Include="src\LL_GridTile.cpp" />
     <ClCompile Include="src\LL_Maths.cpp" />
+    <ClCompile Include="src\LL_Pathfinder.cpp" />
     <ClCompile Include="src\LL_RTS_Character.cpp" />
     <ClCompile Include="src\LL_RTS_Entity.cpp" />
     <ClCompile Include="src\LL_RTS_EntitySlot.cpp" />
@@ -151,8 +153,10 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\LL_Geometry.h" />
+    <ClInclude Include="inc\LL_Grid.h" />
+    <ClInclude Include="inc\LL_GridTile.h" />
     <ClInclude Include="inc\LL_Maths.h" />
+    <ClInclude Include="inc\LL_Pathfinder.h" />
     <ClInclude Include="inc\LL_RTS_Character.h" />
     <ClInclude Include="inc\LL_RTS_Entity.h" />
     <ClInclude Include="inc\LL_RTS_EntitySlot.h" />

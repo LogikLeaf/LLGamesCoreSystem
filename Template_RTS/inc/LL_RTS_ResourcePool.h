@@ -4,14 +4,16 @@
 
 namespace LL::RTS {
 
+	/** Holds a player's stock of each Resource type. */
 	class ResourcePool {
 	public:
-		
+
 		ResourcePool();
 
-		// Add or substract a chosen resource
+		/** Adds (or subtracts, if negative) an amount to the given resource. */
 		void Adjust(Resource resource, int64_t amount);
-		// How much do we have of the specified resource
+
+		/** Returns the current amount of the given resource. */
 		uint32_t Get(Resource resource);
 
 	private:

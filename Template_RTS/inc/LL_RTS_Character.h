@@ -18,9 +18,9 @@ namespace LL::RTS {
 
     class GameMaster;
     class Player;
-    struct Vector2D;
     class ResourcePool;
 
+    /** A controllable unit that executes orders, moves, and fights. */
     class Character : public Entity {
 
     public:
@@ -28,7 +28,7 @@ namespace LL::RTS {
         Character();
         Character(GameMaster* GM);
 
-        // Time
+        /** Advances this character's state (orders, movement, cooldowns) by deltaTime seconds. */
         void Update(float deltaTime);
 
     private:
@@ -36,14 +36,14 @@ namespace LL::RTS {
         void ExecuteOrders();
 
         // Movements
-        void MoveToward(Maths::Vector2D target, float deltaTime);
+        void MoveToward(Maths::Position target, float deltaTime);
         void UpdateMovement(float deltaTime);
 
         // Range detection for attack
         bool IsInRange(Character* inTarget) const;
 
         // Chase
-        void StartChase(Character* target, Maths::Vector2D offset);
+        void StartChase(Character* target, Maths::Position offset);
         void StopChase();
 
         // Cooldowns
@@ -55,42 +55,50 @@ namespace LL::RTS {
         std::string GetName() const;
         uint32_t GetAttack() const;
         Stat GetHealth() const;
-        Maths::Vector2D GetPosition() const;
-        Maths::Vector2D GetDirection() const;
-        Maths::Vector2D GetVelocity() const;
+        Maths::Position GetPosition() const;
+        Maths::Position GetDirection() const;
+        Maths::Position GetVelocity() const;
 
         // Setters
+        /** Sets this character's display name. */
         void SetName(const std::string& inName);
 
-        // Orders
+        /** Queues an order to be executed after any pending orders. */
         void AddOrder(Order order);
 
 
         // Actions
+        /** Reduces health by the given amount and kills the character if it reaches zero. */
         void TakeDamage(uint32_t damage);
 
+        /** Deals this character's attack damage to inTarget. */
         void Attack(Character* inTarget);
 
 
+        /** Marks this character as dead. */
         void Kill();
 
         // ===== Movements =====
-        // Go to a specified destination
-        void MoveTo(Maths::Vector2D inVector);
+        /** Clears the destination queue and moves directly to the given position. */
+        void MoveTo(Maths::Position inVector);
 
-        // Buffer multiple destinations
-        void AddDestination(Maths::Vector2D inDestination);
+        /** Queues an additional destination to move to after the current one. */
+        void AddDestination(Maths::Position inDestination);
 
-        // Stop moving
+        /** Stops movement and clears queued destinations. */
         void Stop();
 
         // Debug tool
+        /** Logs the character's current position to the console. */
         void LogPosition();
         // =====================
 
         // Flags
+        /** Sets the given state flag. */
         void SetFlag(Flag flag);
+        /** Clears the given state flag. */
         void ClearFlag(Flag flag);
+        /** Returns whether the given state flag is set. */
         bool HasFlag(Flag flag) const;
 
 
@@ -112,12 +120,12 @@ namespace LL::RTS {
         std::unique_ptr<ResourcePool> maintenanceCost;
 
 
-        Maths::Vector2D position = { 0, 0 };
-        Maths::Vector2D direction = { 0, 0 };
-        Maths::Vector2D velocity = { 0, 0 };
+        Maths::Position position = { 0, 0 };
+        Maths::Position direction = { 0, 0 };
+        Maths::Position velocity = { 0, 0 };
 
         // Character's target destinations (we can buffer multiple destinations)
-        std::vector<Maths::Vector2D> destinations;
+        std::vector<Maths::Position> destinations;
 
         // The Character will execute each one of these orders, one after the other
         std::vector<Order> orders;
@@ -126,11 +134,11 @@ namespace LL::RTS {
         Character* chaseTarget = nullptr;
 
         // Per-unit chase offset - When chasing an attacked target keep formation
-        Maths::Vector2D chaseOffset = { 0, 0 };
+        Maths::Position chaseOffset = { 0, 0 };
 
         // Who owns me?
         // TODO: make it the AI Controller by default if no player controls it
-        Player* owningPlayer = nullptr; 
+        Player* owningPlayer = nullptr;
 
 
     };

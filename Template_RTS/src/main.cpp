@@ -5,7 +5,8 @@
 #include "LL_RTS_Player.h"
 #include "LL_RTS_Character.h"
 
-
+// Demo entry point: spawns a few characters and exercises orders,
+// formation movement, and combat over a fixed number of ticks.
 int main() {
     LL::RTS::GameMaster GM;
     LL::RTS::Player player(&GM);
@@ -18,7 +19,7 @@ int main() {
 
     auto charlie = std::make_unique<LL::RTS::Character>();
     charlie->SetName("Charlie Chaplin");
-    
+
     auto nelson = std::make_unique<LL::RTS::Character>();
     nelson->SetName("Nelson Mandela");
 

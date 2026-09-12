@@ -15,27 +15,25 @@ namespace LL::RTS {
 
 	class GameMaster;
 
+	/** Owns a single Entity slot managed by the GameMaster, keeping its id stable while occupied. */
 	class EntitySlot {
 	public:
-		// Default constructor
 		EntitySlot();
-		// Constructor to get the mandatory GameMaster's reference and my EntityId
+		/** Creates a slot bound to a GameMaster and a given id. */
 		EntitySlot(GameMaster* GM, uint32_t id);
 
-		// Getters
-		// Get the Entity reference
+		/** Returns the owned Entity, or nullptr if the slot is empty. */
 		Entity* GetEntity();
-		// Get the EntityId
+		/** Returns this slot's EntityId. */
 		EntityId GetId() const;
 
-
-		// Returns true if an entity is occupying this slot
+		/** Returns true if an entity currently occupies this slot. */
 		bool IsOccupied();
 
-		// Destroy the owned Entity, and make the slot available
+		/** Destroys the owned Entity and frees the slot for reuse. */
 		void Destroy();
 
-		// Add a new Entity
+		/** Assigns a new Entity to this slot. */
 		void Add(std::unique_ptr<Entity> entity);
 
 	private:

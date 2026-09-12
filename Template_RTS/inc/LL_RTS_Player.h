@@ -11,52 +11,57 @@ namespace LL::RTS {
     class GameMaster;
     struct Order;
     class Character;
-    //class ResourcePool;
 
+    /** Represents a player: owns resources and controls a selection of characters. */
     class Player {
     public:
-        // Default constructor
         Player();
-        // Convenience constructor used by main.cpp
+        /** Convenience constructor used by main.cpp. */
         Player(GameMaster* GM);
-        // This constructor is called by GM to initialize the player
+        /** Constructor called by the GameMaster to initialize a player with its id. */
         Player(GameMaster* GM, uint32_t id);
 
-        // Tick Update
         void Update();
 
-        // Select a single Character
+        /** Selects a single Character, replacing the current selection. */
         void SelectCharacter(Character* inCharacter);
 
-        // Add/Remove Characters to selection
+        /** Adds a Character to the current selection. */
         void AddToSelection(Character* inCharacter);
+        /** Removes a Character from the current selection. */
         void DeselectCharacter(Character* inCharacter);
+        /** Clears the current selection. */
         void ClearSelection();
 
-        // Targeting
+        /** Sets the current attack target. */
         void SelectTarget(Character* inTarget);
+        /** Clears the current attack target if it matches inTarget. */
         void DeselectTarget(Character* inTarget);
 
-        // Broadcast an order to all selected Characters
+        /** Broadcasts an order to all selected characters. */
         void GiveOrder(Order order);
 
-        // Gettters
+        /** Returns the selected character at the given index. */
         Character* GetSelectedCharacter(size_t index);
+        /** Returns all currently selected characters. */
         const std::vector<Character*>& GetSelectedCharacters() const;
 
-        // Units maintenance cost - called by each owned unit
+        /** Attempts to pay a unit's maintenance cost; returns false if the player can't afford it. */
         bool PayUnit(ResourcePool* resourceCost);
 
-        // Buildings maintenance cost - called by each owned building
+        /** Attempts to pay a building's maintenance cost; returns false if the player can't afford it. */
         bool PayBuilding(ResourcePool resourceCost);
 
-        // Subtract the specified resource from our pool. Called for one time paiements 
-        // (e.g. When buying a new unit, or when giving money to another player)
-        // Returns false and doesn't substract if player doesn't have enough to pay
+        /**
+         * Subtracts the given amount of a resource from the player's pool, e.g. for purchases or transfers.
+         * @return False if the player doesn't have enough to pay; the pool is left unchanged in that case.
+         */
         bool UseResource(Resource resource, uint32_t amount);
 
-        // Give the specified resource to the player. Returns the final amount the player has.
-        // Called by anything that produces any resource.
+        /**
+         * Adds the given amount of a resource to the player's pool.
+         * @return The resulting total amount of that resource.
+         */
         uint32_t AddResource(Resource resource, uint32_t amount);
 
     private:
