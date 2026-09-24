@@ -6,7 +6,7 @@
 
 ## Overview
 
-Template RTS is a modular framework designed to provide a reusable foundation for future 2D games. The project is intended to support several genres, including real-time strategy, turn-based games, and arcade games, while keeping the underlying systems independent and reusable.
+LL Games Core System is a modular framework designed to provide a reusable foundation for future 2D games. The project is intended to support several genres, including real-time strategy, turn-based games, and arcade games, while keeping the underlying systems independent and reusable.
 
 The long-term goal is to build a robust core that can be extended with game-specific modules without compromising the reliability of the systems shared by every project.
 
