@@ -1,8 +1,0 @@
-<map id="LL::Maths::Triangle" name="LL::Maths::Triangle">
-<area shape="rect" id="Node000001" title=" " alt="" coords="6,307,139,333"/>
-<area shape="rect" id="Node000002" href="$struct_l_l_1_1_maths_1_1_position.html" title=" " alt="" coords="5,5,140,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,45,65,125,67,230,74,306,68,306,62,230,60,125,69,50"/>
-<area shape="rect" id="Node000003" href="$struct_l_l_1_1_maths_1_1_vector.html" title=" " alt="" coords="93,145,217,172"/>
-<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="88,42,150,144,145,146,87,48"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,186,81,308,77,305,139,185"/>
-</map>
