@@ -143,6 +143,7 @@
     <ClCompile Include="src\LL_Grid.cpp" />
     <ClCompile Include="src\LL_GridTile.cpp" />
     <ClCompile Include="src\LL_Maths.cpp" />
+    <ClCompile Include="src\LL_Movement.cpp" />
     <ClCompile Include="src\LL_Pathfinder.cpp" />
     <ClCompile Include="src\LL_RTS_Character.cpp" />
     <ClCompile Include="src\LL_RTS_Entity.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="inc\LL_Grid.h" />
     <ClInclude Include="inc\LL_GridTile.h" />
     <ClInclude Include="inc\LL_Maths.h" />
+    <ClInclude Include="inc\LL_Movement.h" />
     <ClInclude Include="inc\LL_Pathfinder.h" />
     <ClInclude Include="inc\LL_RTS_Character.h" />
     <ClInclude Include="inc\LL_RTS_Entity.h" />

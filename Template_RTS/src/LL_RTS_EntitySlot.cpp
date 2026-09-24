@@ -1,4 +1,3 @@
-#pragma once
 #include "LL_RTS_EntitySlot.h"
 #include "LL_RTS_GameMaster.h"
 
@@ -20,9 +19,9 @@ namespace LL::RTS {
 	}
 
 	void EntitySlot::Destroy() {
-		entity.reset();
 		entityId.generation++;
 		if (GM) GM->AddAvailableSlot(entityId.id);
+		entity.reset();
 	}
 
 

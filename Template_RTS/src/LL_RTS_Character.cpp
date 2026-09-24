@@ -8,25 +8,47 @@ namespace LL::RTS {
 
     // Default constructor (safe minimal implementation)
     Character::Character()
-        : Entity(nullptr, Maths::Position{ 0,0 }, EntityId()) {
+        : Entity(nullptr, EntityId()) {
     }
 
     // Make sure we initialize base Entity with the GM (use a default position/id here)
     Character::Character(GameMaster* GM) 
-        : Entity(GM, Maths::Position{0,0}, EntityId()) { }
+        : Entity(GM, EntityId()) { }
 
-    // Time
-    void Character::Update(float deltaTime) {
+    Character::Character(GameMaster* GM, std::string name) 
+        : Entity(GM, EntityId()), name(name) { }
+
+    void Character::Update(float deltaTime, Grid& grid,
+        std::span<Movement::MovingAgent* const> neighbors) {
         if (HasFlag(Flag::Dead)) return;
-        
-        // Decrement attack timer (runtime state)
+
         if (attackTimer > 0.0f) {
             attackTimer -= deltaTime;
             if (attackTimer < 0.0f) attackTimer = 0.0f;
         }
 
         ExecuteOrders();
-        UpdateMovement(deltaTime);
+
+        if (chaseTarget && !chaseTarget->HasFlag(Flag::Dead)) {
+            Maths::Position chasePos = {
+                chaseTarget->GetPosition().x + chaseOffset.x,
+                chaseTarget->GetPosition().y + chaseOffset.y
+            };
+
+            constexpr float replanThreshold = 1.0f;
+            if (Maths::Vector(lastChaseAnchor, chasePos).Length() > replanThreshold) {
+                movementController.SetDestination(grid, agent.position, chasePos);
+                lastChaseAnchor = chasePos;
+            }
+        }
+
+        movementController.Update(deltaTime, agent, static_cast<float>(movementSpeed.current), neighbors);
+
+        if (agent.velocity.x != 0.0f || agent.velocity.y != 0.0f) {
+            direction = Maths::Vector({ 0,0 }, agent.velocity).Normalize();
+            SetFlag(Flag::Moving);
+        }
+        else ClearFlag(Flag::Moving);
 
         /* TODO: */
         // bool paid = owningPlayer->PayUnit(maintenanceCost); // I ask the player to pay for my maintenance, returns false if he couldn't
@@ -38,6 +60,7 @@ namespace LL::RTS {
         */
     }
 
+    // ExecuteOrders
     void Character::ExecuteOrders() {
         if (orders.empty()) return;
 
@@ -45,77 +68,62 @@ namespace LL::RTS {
 
         switch (execution.type) {
         case OrderType::Move:
-            MoveTo(execution.destination);
-
-            if (position.x == execution.destination.x &&
-                position.y == execution.destination.y) {
-
+            if (!destinationPlanned && GM) {
+                movementController.SetDestination(GM->GetGrid(), agent.position, execution.destination);
+                destinationPlanned = true;
+            }
+            if (movementController.HasArrived()) {
                 orders.erase(orders.begin());
+                destinationPlanned = false;
             }
             break;
 
-        case OrderType::Attack:
-            // Is Target invalid or already dead?
-            if (!execution.target ||
-                execution.target->HasFlag(Flag::Dead)) {
-
-                // Stop chasing if target is dead or invalid
+        case OrderType::Attack: {
+            if (!execution.target || execution.target->HasFlag(Flag::Dead)) {
                 StopChase();
                 orders.erase(orders.begin());
+                destinationPlanned = false;
                 break;
             }
 
-             // Compute the desired anchor position (target position + per-unit offset stored in execution.destination)
-            {
-                Maths::Position desired = {
-                    execution.target->GetPosition().x + execution.destination.x,
-                    execution.target->GetPosition().y + execution.destination.y
-                };
+            Maths::Position desired = {
+                execution.target->GetPosition().x + execution.destination.x,
+                execution.target->GetPosition().y + execution.destination.y
+            };
 
-                // Distance to desired anchor
-                float distanceToAnchor = Maths::Vector(position, desired).Length();
+            float distanceToAnchor = Maths::Vector(agent.position, desired).Length();
 
-                // If within attack range (considering our range stat), stop chasing and attack
-                if (distanceToAnchor <= static_cast<float>(range.current)) {
-                    StopChase();
+            if (distanceToAnchor <= static_cast<float>(range.current)) {
+                StopChase();
 
-                    // Is cooldown over?
-                    if (attackTimer <= 0.0f) {
-                        Attack(execution.target);
-                        
-                        // Reset timer to enter cooldown
-                        attackTimer = GetAttackCooldownsSeconds();
-                    }
-
-                    if (execution.target->HasFlag(Flag::Dead)) {
-                        orders.erase(orders.begin());
-                    }
+                if (attackTimer <= 0.0f) {
+                    Attack(execution.target);
+                    attackTimer = GetAttackCooldownsSeconds();
                 }
-                else {
-                    // Need to move toward the desired anchor. Start chase with stored offset if first time.
-                    if (chaseTarget != execution.target) {
-                        MoveTo(desired);
-                        StartChase(execution.target, execution.destination);
-                    }
-                    else {
-                        // Already chasing it, if we reached last chase point we execute a new MoveTo to keep following
-                        if (destinations.empty()) MoveTo(desired);
-                        // Otherwise do nothing because movement is in progress
-                    }
+
+                if (execution.target->HasFlag(Flag::Dead)) {
+                    orders.erase(orders.begin());
+                    destinationPlanned = false;
                 }
             }
+            else if (chaseTarget != execution.target) {
+                StartChase(execution.target, execution.destination);
+            }
+            // else: already chasing, MovementController keeps re-targeting each Update via StartChase's retarget (see below).
             break;
+        }
 
         case OrderType::Stop:
             Stop();
             orders.clear();
+            destinationPlanned = false;
             break;
         }
-
     }
 
 
-    void Character::MoveToward(Maths::Position target, float deltaTime) {
+
+    /*void Character::MoveToward(Maths::Position target, float deltaTime) {
         Maths::Vector toTarget(position, target);
         float distance = toTarget.Length();
         if (distance <= 0.0f) return;
@@ -174,27 +182,25 @@ namespace LL::RTS {
             if (destinations.empty())
                 ClearFlag(Flag::Moving);
         }
-    }
+    }*/
 
 
-    bool Character::IsInRange(Character* inTarget) const {
-        if (!inTarget) return false;
+    bool Character::IsInRange(Character* target) const {
+        if (!target) return false;
 
-        float distance = Maths::Vector(position, inTarget->GetPosition()).Length();
-
+        const float distance = Maths::Vector(agent.position, target->GetPosition()).Length();
         return distance <= static_cast<float>(range.current);
     }
 
     void Character::StartChase(Character* target, Maths::Position offset) { 
         chaseTarget = target; 
         chaseOffset = offset;
+        lastChaseAnchor = { 0,0 };
     }
     
     void Character::StopChase() {
         chaseTarget = nullptr;
         chaseOffset = { 0, 0 };
-        destinations.clear();
-        ClearFlag(Flag::Moving);
     }
 
     float Character::GetAttackCooldownsSeconds() const {
@@ -203,11 +209,12 @@ namespace LL::RTS {
     }
 
     // Getters
-    std::string Character::GetName() const { return name; }
-    uint32_t Character::GetAttack() const { return attackDamage.current; }
-    Maths::Position Character::GetPosition() const { return position; }
-    Maths::Position Character::GetDirection() const { return direction; }
-    Maths::Position Character::GetVelocity() const { return velocity; }
+    std::string Character::GetName() const              { return name; }
+    uint32_t Character::GetAttack() const               { return attackDamage.current; }
+    Maths::Position Character::GetPosition() const      { return agent.position; }
+    Maths::Position Character::GetVelocity() const      { return agent.velocity; }
+    Maths::Position Character::GetDirection() const     { return direction; }
+    Movement::MovingAgent& Character::GetMovingAgent()  { return agent; }
 
     // Setters
     void Character::SetName(const std::string& inName) { name = inName; }
@@ -236,13 +243,13 @@ namespace LL::RTS {
         Log(name + " has " + std::to_string(health.current) + " health left...");
     }
 
-    void Character::Attack(Character* inTarget) {
-        if (!inTarget) return;
-        if (HasFlag(Flag::Dead) || inTarget->HasFlag(Flag::Dead)) return;
+    void Character::Attack(Character* target) {
+        if (!target) return;
+        if (HasFlag(Flag::Dead) || target->HasFlag(Flag::Dead)) return;
 
         Log(name + " attacks his target!");
 
-        inTarget->TakeDamage(attackDamage.current);
+        target->TakeDamage(attackDamage.current);
     }
 
 
@@ -255,27 +262,28 @@ namespace LL::RTS {
 
     // ===== Movements =====
     // Go to a specified destination
-    void Character::MoveTo(Maths::Position inVector) {
-        destinations.clear();
-        destinations.push_back(inVector);
+    void Character::MoveTo(Grid& grid, Maths::Position destination) {
+        movementController.SetDestination(grid, agent.position, destination);
+        destinationPlanned = false;
     }
 
-    // Buffer multiple destinations
+    /*// Buffer multiple destinations
     void Character::AddDestination(Maths::Position inDestination) {
         destinations.push_back(inDestination);
-    }
+    }*/
 
     // Stop moving
     void Character::Stop() {
-        destinations.clear();
-        ClearFlag(Flag::Moving);
+        movementController.Stop();
         StopChase();
+        destinationPlanned = false;
+        ClearFlag(Flag::Moving);
     }
 
 
     void Character::LogPosition() {
-        std::cout << name << " position is x = " << position.x
-            << "; y = " << position.y << std::endl;
+        std::cout << name << " position is x = " << agent.position.x
+            << "; y = " << agent.position.y << std::endl;
     }
     // =====================
 

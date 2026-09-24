@@ -1,32 +1,28 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <span>
 
 #include "LL_RTS_GameMaster.h"
 #include "LL_RTS_Player.h"
 #include "LL_RTS_Character.h"
 
-// Demo entry point: spawns a few characters and exercises orders,
-// formation movement, and combat over a fixed number of ticks.
 int main() {
     LL::RTS::GameMaster GM;
     LL::RTS::Player player(&GM);
 
-    auto bob = std::make_unique<LL::RTS::Character>();
-    bob->SetName("Bob Dylan");
+    // GameMaster owns every Character's lifetime via its EntitySlots;
+    // these are non-owning handles, valid as long as GM is alive and the slot isn't reused
+    LL::RTS::Character* bob = GM.SpawnCharacter("Bob Dylan");
+    LL::RTS::Character* lili = GM.SpawnCharacter("Lili");
+    LL::RTS::Character* charlie = GM.SpawnCharacter("Charlie Chaplin");
+    LL::RTS::Character* nelson = GM.SpawnCharacter("Nelson Mandela");
+    
 
-    auto lili = std::make_unique<LL::RTS::Character>();
-    lili->SetName("Lili");
-
-    auto charlie = std::make_unique<LL::RTS::Character>();
-    charlie->SetName("Charlie Chaplin");
-
-    auto nelson = std::make_unique<LL::RTS::Character>();
-    nelson->SetName("Nelson Mandela");
-
-    // Select Bob and Charlie as a group (will receive formation offsets)
-    player.SelectCharacter(bob.get());
-    player.AddToSelection(charlie.get());
-    player.AddToSelection(nelson.get());
+    // Select Bob, Charlie and Nelson as a group (will receive formation offsets)
+    player.SelectCharacter(bob);
+    player.AddToSelection(charlie);
+    player.AddToSelection(nelson);
 
     // Move group to a far destination so formation is visible
     player.GiveOrder({
@@ -39,35 +35,34 @@ int main() {
     player.GiveOrder({
         LL::RTS::OrderType::Attack,
         {0,0},
-        lili.get()
+        lili
         });
 
     // Lili moves independently elsewhere
-    player.SelectCharacter(lili.get());
     lili->AddOrder({
         LL::RTS::OrderType::Move,
         {30.0f, 10.0f},
         nullptr
         });
 
-    float gameSpeedTest = 0.5f; // seconds per tick
+    float gameSpeedTest = 1.0f; // seconds per tick
 
-    // Run a few dozen ticks and log positions to watch formation
+    // Run a few dozen ticks and log positions to watch formation.
+    // GameMaster::Update drives every spawned Character, building a consistent
+    // per-tick neighbor snapshot for local avoidance.
     for (int i = 0; i < 40; ++i) {
-        bob->Update(gameSpeedTest);
+        std::cout << "---- tick " << i << " ----\n";
+
         bob->LogPosition();
-
-        charlie->Update(gameSpeedTest);
         charlie->LogPosition();
-
-        nelson->Update(gameSpeedTest);
         nelson->LogPosition();
-
-        lili->Update(gameSpeedTest);
         lili->LogPosition();
 
-        std::cout << "---- tick " << i << " ----\n";
+        GM.Update(gameSpeedTest);
+
     }
 
+    Log("main completed, returning now.");
+    std::cout << std::flush;
     return 0;
 }

@@ -12,15 +12,14 @@ namespace LL::RTS {
 	/** Base class for any object spawned in the world; owns a position and a unique id. */
 	class Entity {
 	public:
-		Entity(GameMaster* GM, Maths::Position position, EntityId id);
+		Entity(GameMaster* GM, EntityId id);
 		/** Notifies the GameMaster that this entity's id is now free. */
-		~Entity();
+		virtual ~Entity();
 
 		/** Sets this entity's unique id. */
 		void SetId(EntityId id);
 
 	protected:
-		Maths::Position position = { 0,0 };
 		GameMaster* GM = nullptr;
 		EntityId id = { 0,0 };
 	};

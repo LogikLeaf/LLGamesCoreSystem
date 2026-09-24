@@ -21,10 +21,10 @@ namespace LL::Pathfinder {
 		 * @param goalWorld Goal position in world space.
 		 * @return Ordered waypoints from start to goal, or an empty vector if no path exists.
 		 */
-		static std::vector<Maths::Position> FindPath(Grid::Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld);
+		static std::vector<Maths::Position> FindPath(Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld);
 
 		/** Same as FindPath but restricted to 4-way movement (no diagonals). */
-		static std::vector<Maths::Position> FindPathNoDiagonal(Grid::Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld);
+		static std::vector<Maths::Position> FindPathNoDiagonal(Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld);
 	};
 
 
@@ -41,7 +41,7 @@ namespace LL::Pathfinder {
 		 * @param goalWorld Goal position in world space.
 		 * @return Ordered waypoints from start to goal, or an empty vector if no path exists.
 		 */
-		static std::vector<Maths::Position> FindPath(Grid::Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld);
+		static std::vector<Maths::Position> FindPath(Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld);
 	};
 
 }

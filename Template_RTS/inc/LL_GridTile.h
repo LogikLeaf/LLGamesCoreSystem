@@ -7,7 +7,7 @@
 
 #include "LL_Maths.h"
 
-namespace LL::Grid {
+namespace LL {
 
 	/** Coordinates of a tile within the grid (not world space). */
 	struct GridPosition {
@@ -16,17 +16,17 @@ namespace LL::Grid {
 	};
 
 	/** Represents a single cell of the grid. */
-	class Tile {
+	class GridTile {
 	public:
 		// Base constructor
-		Tile(const uint32_t& id,
+		GridTile(const uint32_t& id,
 			const GridPosition& gridPosition)
 			: id(id),
 			gridPosition(gridPosition) {
 		}
 
 		// Constructor if the world position isn't 0,0
-		Tile(const uint32_t& id,
+		GridTile(const uint32_t& id,
 			const GridPosition& gridPosition,
 			const Maths::Position& worldPosition)
 			: id(id),

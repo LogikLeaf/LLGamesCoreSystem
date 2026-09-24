@@ -69,6 +69,10 @@ namespace LL::Maths {
      */
     Vector PerpendicularVectorFrom(const Vector& base, float t = 0.0f, int directionSign = +1, float length = -1.0f);
 
+    /** Circular collision bounds used for unit-unit and unit-obstacle checks. */
+    struct CircleBounds {
+        float radius = 0.5f;
+    };
 
     /** A triangle defined by three positions. */
     struct Triangle {

@@ -14,6 +14,11 @@ namespace LL::RTS {
     Player::Player(GameMaster* GM) : GM(GM), id(0) {}
     Player::Player(GameMaster* GM, uint32_t id) : GM(GM), id(id) {}
 
+    Player::~Player()
+    {
+        Log("Player destructor running");
+    }
+
 
 
 

@@ -3,10 +3,12 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <span>
 
 #include "LL_RTS_Enumerators.h"
 #include "LL_RTS_Structs.h"
 #include "LL_RTS_Entity.h"
+#include "LL_Movement.h"
 
 // Global log for debug
 template <typename T>
@@ -27,20 +29,22 @@ namespace LL::RTS {
 
         Character();
         Character(GameMaster* GM);
+        Character(GameMaster* GM, std::string name);
 
         /** Advances this character's state (orders, movement, cooldowns) by deltaTime seconds. */
-        void Update(float deltaTime);
+        void Update(float deltaTime, Grid& grid,
+            std::span<Movement::MovingAgent* const> neighbors);
 
     private:
         // Orders
         void ExecuteOrders();
 
         // Movements
-        void MoveToward(Maths::Position target, float deltaTime);
-        void UpdateMovement(float deltaTime);
+        //void MoveToward(Maths::Position target, float deltaTime);
+        //void UpdateMovement(float deltaTime);
 
         // Range detection for attack
-        bool IsInRange(Character* inTarget) const;
+        bool IsInRange(Character* target) const;
 
         // Chase
         void StartChase(Character* target, Maths::Position offset);
@@ -59,6 +63,9 @@ namespace LL::RTS {
         Maths::Position GetDirection() const;
         Maths::Position GetVelocity() const;
 
+        /** Non-owning access to this character's movement agent (position/velocity/bounds), for GameMaster snapshots. */
+        Movement::MovingAgent& GetMovingAgent();
+
         // Setters
         /** Sets this character's display name. */
         void SetName(const std::string& inName);
@@ -71,21 +78,21 @@ namespace LL::RTS {
         /** Reduces health by the given amount and kills the character if it reaches zero. */
         void TakeDamage(uint32_t damage);
 
-        /** Deals this character's attack damage to inTarget. */
-        void Attack(Character* inTarget);
+        /** Deals this character's attack damage to target. */
+        void Attack(Character* target);
 
 
         /** Marks this character as dead. */
         void Kill();
 
         // ===== Movements =====
-        /** Clears the destination queue and moves directly to the given position. */
-        void MoveTo(Maths::Position inVector);
+        /** Clears the current path and (re)plans a route to position using the grid. */
+        void MoveTo(Grid& grid, Maths::Position destination);
 
-        /** Queues an additional destination to move to after the current one. */
-        void AddDestination(Maths::Position inDestination);
+        ///** Queues an additional destination to move to after the current one. */
+        //void AddDestination(Maths::Position inDestination);
 
-        /** Stops movement and clears queued destinations. */
+        /** Stops movement and clears the current path. */
         void Stop();
 
         // Debug tool
@@ -119,19 +126,20 @@ namespace LL::RTS {
         // How much of each resource this unit costs each tick?
         std::unique_ptr<ResourcePool> maintenanceCost;
 
-
-        Maths::Position position = { 0, 0 };
+        // Position/Velocity/Bounds live in the agent, consumed directly by MovementController
+        Movement::MovingAgent agent;
         Maths::Position direction = { 0, 0 };
-        Maths::Position velocity = { 0, 0 };
 
-        // Character's target destinations (we can buffer multiple destinations)
-        std::vector<Maths::Position> destinations;
+        Movement::MovementController movementController;
 
         // The Character will execute each one of these orders, one after the other
         std::vector<Order> orders;
 
         // Let's start the hunt
         Character* chaseTarget = nullptr;
+
+        bool destinationPlanned = false;
+        Maths::Position lastChaseAnchor = { 0,0 };
 
         // Per-unit chase offset - When chasing an attacked target keep formation
         Maths::Position chaseOffset = { 0, 0 };

@@ -2,7 +2,7 @@
 
 #include "LL_Grid.h"
 
-namespace LL::Grid {
+namespace LL {
 
 	float Grid::GridXToWorldX(uint32_t xGrid) const
 	{
@@ -54,7 +54,7 @@ namespace LL::Grid {
 		return MAP_SIZE_Y;
 	}
 
-	Tile* Grid::GetTileAt(uint32_t x, uint32_t y)
+	GridTile* Grid::GetTileAt(uint32_t x, uint32_t y)
 	{
 		size_t id = GetTileIdFromGridCoordinates(x, y);
 		if (id >= tiles.size()) return nullptr;
@@ -71,7 +71,7 @@ namespace LL::Grid {
 			float wx = GridXToWorldX(xGrid);
 			float wy = GridYToWorldY(yGrid);
 
-			tiles.push_back(std::make_unique<Tile>(i, GridPosition{ xGrid, yGrid }, Maths::Position{ wx, wy }));
+			tiles.push_back(std::make_unique<GridTile>(i, GridPosition{ xGrid, yGrid }, Maths::Position{ wx, wy }));
 		}
 	}
 }

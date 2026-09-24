@@ -3,8 +3,8 @@
 
 namespace LL::RTS {
 
-	Entity::Entity(GameMaster* GM, Maths::Position position, EntityId id)
-		: GM(GM), position(position), id(id) {
+	Entity::Entity(GameMaster* GM, EntityId id)
+		: GM(GM), id(id) {
 	}
 
 	Entity::~Entity() {

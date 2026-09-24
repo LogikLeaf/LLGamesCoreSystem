@@ -27,12 +27,12 @@ namespace LL::Pathfinder {
 			return std::sqrt(dx * dx + dy * dy);
 		}
 
-		inline bool InBounds(Grid::Grid* grid, int x, int y) {
+		inline bool InBounds(Grid* grid, int x, int y) {
 			return x >= 0 && y >= 0 && x < static_cast<int>(grid->GetMapSizeX()) && y < static_cast<int>(grid->GetMapSizeY());
 		}
 
 		// Convert grid coordinates to world position (center of tile)
-		inline Maths::Position GridToWorld(Grid::Grid* grid, int gx, int gy) {
+		inline Maths::Position GridToWorld(Grid* grid, int gx, int gy) {
 			Maths::Position p;
 			p.x = grid->GridXToWorldX(static_cast<uint32_t>(gx));
 			p.y = grid->GridYToWorldY(static_cast<uint32_t>(gy));
@@ -40,7 +40,7 @@ namespace LL::Pathfinder {
 		}
 
 		// Convert world position to grid coords (round toward nearest int)
-		inline void WorldToGrid(Grid::Grid* grid, const Maths::Position& w, int& outX, int& outY) {
+		inline void WorldToGrid(Grid* grid, const Maths::Position& w, int& outX, int& outY) {
 			float gx = grid->WorldXToGridX(w.x);
 			float gy = grid->WorldYToGridY(w.y);
 			// assume each tile is 1 unit in world space (consistent with grid helpers)
@@ -50,7 +50,7 @@ namespace LL::Pathfinder {
 
 		// Bresenham-style line of sight check: returns false if any tile between
 		// (x0,y0) and (x1,y1) is missing or is an obstacle.
-		bool LineOfSight(Grid::Grid* grid, int x0, int y0, int x1, int y1) {
+		bool LineOfSight(Grid* grid, int x0, int y0, int x1, int y1) {
 			int dx = std::abs(x1 - x0);
 			int dy = std::abs(y1 - y0);
 			int sx = (x0 < x1) ? 1 : -1;
@@ -61,26 +61,33 @@ namespace LL::Pathfinder {
 			int y = y0;
 			while (true) {
 				auto tile = grid->GetTileAt(static_cast<uint32_t>(x), static_cast<uint32_t>(y));
-				if (!tile) return false;
-				if (tile->GetObstacle()) return false;
+				if (!tile || tile->GetObstacle()) return false;
 
 				if (x == x1 && y == y1) break;
+
 				int e2 = 2 * err;
-				if (e2 > -dy) {
-					err -= dy;
-					x += sx;
+				const bool stepX = e2 > -dy;
+				const bool stepY = e2 < dx;
+
+				if (stepX && stepY) {
+					// Diagonal step: reject if either flanking orthogonal tile is blocked,
+					// consistent with the neighbor-expansion corner-cut rule elsewhere.
+					auto flankX = grid->GetTileAt(static_cast<uint32_t>(x + sx), static_cast<uint32_t>(y));
+					auto flankY = grid->GetTileAt(static_cast<uint32_t>(x), static_cast<uint32_t>(y + sy));
+					if ((flankX && flankX->GetObstacle()) || (flankY && flankY->GetObstacle())) {
+						return false;
+					}
 				}
-				if (e2 < dx) {
-					err += dx;
-					y += sy;
-				}
+
+				if (stepX) { err -= dy; x += sx; }
+				if (stepY) { err += dx; y += sy; }
 			}
 			return true;
 		}
 
 		// Walks parent links from the goal back to the start and returns the
 		// resulting waypoints in start-to-goal order (world space, tile centers).
-		std::vector<Maths::Position> ReconstructPath(Grid::Grid* grid, const std::vector<std::vector<Node>>& nodes, int sx, int sy, int ex, int ey) {
+		std::vector<Maths::Position> ReconstructPath(Grid* grid, const std::vector<std::vector<Node>>& nodes, int sx, int sy, int ex, int ey) {
 			std::vector<Maths::Position> pts;
 			int cx = ex;
 			int cy = ey;
@@ -100,7 +107,7 @@ namespace LL::Pathfinder {
 	}
 
 
-	std::vector<Maths::Position> AStar::FindPath(Grid::Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld) {
+	std::vector<Maths::Position> AStar::FindPath(Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld) {
 		if (!grid) return {};
 
 		int sx, sy, gx, gy;
@@ -189,7 +196,7 @@ namespace LL::Pathfinder {
 	}
 
 
-	std::vector<Maths::Position> AStar::FindPathNoDiagonal(Grid::Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld) {
+	std::vector<Maths::Position> AStar::FindPathNoDiagonal(Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld) {
 		if (!grid) return {};
 
 		int sx, sy, gx, gy;
@@ -267,7 +274,7 @@ namespace LL::Pathfinder {
 	}
 
 
-	std::vector<Maths::Position> AnyAngle::FindPath(Grid::Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld) {
+	std::vector<Maths::Position> AnyAngle::FindPath(Grid* grid, const Maths::Position& startWorld, const Maths::Position& goalWorld) {
 		if (!grid) return {};
 
 		int sx, sy, gx, gy;

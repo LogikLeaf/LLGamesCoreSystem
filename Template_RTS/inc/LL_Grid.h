@@ -17,7 +17,7 @@
 
 
 
-namespace LL::Grid {
+namespace LL {
 
 	/** Owns and manages the tiles of a rectangular grid, and converts between grid and world coordinates. */
 	class Grid {
@@ -82,7 +82,7 @@ namespace LL::Grid {
 		/** Returns the number of tiles along the Y axis. */
 		uint32_t GetMapSizeY() const;
 		/** Returns the tile at the given grid coordinates, or nullptr if out of bounds. */
-		Tile* GetTileAt(uint32_t x, uint32_t y);
+		GridTile* GetTileAt(uint32_t x, uint32_t y);
 
 		// Actions
 		/** Creates and stores every tile of the grid. Must be called once before using the grid. */
@@ -92,7 +92,7 @@ namespace LL::Grid {
 	private:
 		// ----- Variables -----
 		// All the tiles from the actual playing field
-		std::vector<std::unique_ptr<Tile>> tiles;
+		std::vector<std::unique_ptr<GridTile>> tiles;
 		// ---------------------
 	};
 

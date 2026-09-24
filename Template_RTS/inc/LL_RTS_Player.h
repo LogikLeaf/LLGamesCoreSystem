@@ -21,6 +21,8 @@ namespace LL::RTS {
         /** Constructor called by the GameMaster to initialize a player with its id. */
         Player(GameMaster* GM, uint32_t id);
 
+        ~Player();
+
         void Update();
 
         /** Selects a single Character, replacing the current selection. */
