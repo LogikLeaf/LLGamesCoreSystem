@@ -1,0 +1,40 @@
+# Visual Studio
+
+.vs/
+*.vcxproj.user
+
+# Build directories
+
+x64/
+Debug/
+Release/
+build/
+out/
+
+# Build artifacts
+
+*.obj
+*.pdb
+*.ilk
+*.idb
+*.tlog
+*.log
+*.recipe
+*.lastbuildstate
+
+# Keep project files
+
+!*.sln
+!*.slnx
+!*.vcxproj
+!*.vcxproj.filters
+
+# Others
+
+
+.gitattributes
+Todo.txt
+
+# Documentation
+LLGamesCoreSystem/Doxyfile
+LLGamesCoreSystem/.Documentation

@@ -1,4 +1,4 @@
-# Template RTS
+# LL Games Core System
 
 > A modular C++ core system for building 2D games.
 
@@ -12,7 +12,7 @@ The long-term goal is to build a robust core that can be extended with game-spec
 
 ## Documentation
 
-Documentation will be available here: [Documentation](https://sylvain-salviati.com/documentation/ll-core-system)
+Documentation is available here: [Documentation](https://sylvain-salviati.com/documentation/ll-core-system)
 
 ## Current Features
 
