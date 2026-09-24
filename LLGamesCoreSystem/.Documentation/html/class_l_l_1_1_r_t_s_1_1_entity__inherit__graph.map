@@ -1,0 +1,5 @@
+<map id="LL::RTS::Entity" name="LL::RTS::Entity">
+<area shape="rect" id="Node000001" title=" " alt="" coords="17,5,128,32"/>
+<area shape="rect" id="Node000002" href="$class_l_l_1_1_r_t_s_1_1_character.html" title=" " alt="" coords="5,80,140,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,46,75,80,70,79,71,50"/>
+</map>
