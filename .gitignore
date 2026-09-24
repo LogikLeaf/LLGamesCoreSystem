@@ -30,8 +30,7 @@ out/
 !*.vcxproj.filters
 
 # Others
-
-
+.github
 .gitattributes
 Todo.txt
 
